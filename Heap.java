@@ -1,117 +1,141 @@
-import java.util.Collection;
+package eg.edu.alexu.csd.filestructure.sort;
 
 import eg.edu.alexu.csd.filestructure.sort.INode;
 
-public class Heap implements IHeap {
-	private int lenght;
-	private INode[] elements;
-	private final int maxLenght = 1000000;
+import java.util.ArrayList;
+import java.util.Collection;
 
-	public Heap() {
-		elements = new INode[maxLenght];
-		lenght = 0;
+public class Heap<T extends Comparable<T>> implements IHeap<T> {
+	private int Length = 0;
+	private ArrayList<INode<T>> elements = new ArrayList<>();
 
+	@SuppressWarnings("hiding")
+	private class Node<T extends Comparable<T>> implements INode<T> {
+		private int index;
+		private int size;
+		private T value;
+
+		public Node(int index) {
+			this.index = index;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public INode<T> getLeftChild() {
+			if (2 * index >= size) {
+				return null;
+			}
+			return (INode<T>) elements.get(2 * index);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public INode<T> getRightChild() {
+			if (2 * index + 1 >= size) {
+				return null;
+			}
+			return (INode<T>) elements.get(2 * index + 1);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public INode<T> getParent() {
+			if (index / 2 >= size) {
+				return null;
+			}
+			return (INode<T>) elements.get(index / 2);
+		}
+
+		@Override
+		public T getValue() {
+			return value;
+		}
+
+		@Override
+		public void setValue(T value) {
+			this.value = value;
+
+		}
 	}
 
-	@Override
-	public INode getRoot() {
-
-		return elements[1];
+	public INode<T> getRoot() {
+		if (elements.size() == 0) {
+			return null;
+		}
+		return elements.get(1);
 	}
 
-	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return lenght;
+		return Length;
 	}
-	private void swap(final INode node1, final INode node2) {
-		Comparable temp = node1.getValue();
+
+	private void swap(final INode<T> node1, final INode<T> node2) {
+		T temp = (T) node1.getValue();
 		node1.setValue(node2.getValue());
 		node2.setValue(temp);
 	}
 
-	
-	@Override
-	public void heapify(INode node) {
-		if (node == null || node.getLeftChild() == null) {
+	public void heapify(INode<T> node) {
+
+		if (Length == 0) {
 			return;
 		}
-		while (node.getLeftChild()!=null) {
-			int flag=0;
-			if (node.getRightChild()!=null) {
-				if ( node.getLeftChild().getValue().compareTo(node.getValue())>0 &&
-						node.getLeftChild().getValue().compareTo(node.getRightChild().getValue())>0)  {
-					swap( node , node.getLeftChild());
-					heapify(node.getLeftChild());
-				}
-				if ( node.getRightChild().getValue().compareTo(node.getValue())>0 &&
-						node.getLeftChild().getValue().compareTo(node.getRightChild().getValue())<0) { 
-					swap(node,node.getRightChild());
-					heapify(node.getRightChild());
 
-				}
-						
-			
-			}
-			else if (node.getLeftChild().getValue().compareTo(node.getValue())>0) {
-            	swap( node , node.getLeftChild());
-				heapify(node.getLeftChild());
+		INode<T> left = node.getLeftChild();
+		INode<T> right = node.getRightChild();
+		INode<T> bigger = node.getRightChild();
 
-			}
-				
-		
-			
-						
-				
-					
-			
+		if (left != null && left.getValue().compareTo(node.getValue()) > 0) {
+			bigger = left;
+		} else {
+			bigger = node;
 		}
-
+		if (right != null && right.getValue().compareTo(bigger.getValue()) > 0) {
+			bigger = right;
+		}
+		if (bigger != node) {
+			swap(node, bigger);
+			heapify(bigger);
+		}
 	}
 
-	@Override
-	public Comparable extract() {
-		if (lenght == 0) {
-			return null;
+	public T extract() {
+		T max = elements.get(1).getValue();
+		elements.get(1).setValue(elements.get(Length).getValue());
+		elements.remove(Length);
+		Length--;
+		if (Length != 0) {
+			heapify(elements.get(1));
 		}
-		Comparable max=(Comparable) elements[1];
-		elements[1]=elements[lenght];
-		elements[lenght]=null;
-		heapify(elements[1]);
-		
 		return max;
 	}
 
-	@Override
-	public void insert(Comparable element) {
-		if (element==null) return;
-		
-		 elements[++lenght].setValue(element);
-		 heapifyUp(elements[lenght]);
-		
-		
-
-	}
-	private void heapifyUp (INode node) {
-		if (node.getParent()==null) return;
-		if (node.getValue().compareTo(node.getParent().getValue())>0) {
-			swap(node,node.getParent());
-			heapify(node.getParent());
+	public void insert(T element) {
+		if (Length == 0) {
+			elements.add(null);
 		}
-		else return;
-		
+
+		INode<T> node = new Node<T>(Length + 1);
+		node.setValue(element);
+		elements.add(Length + 1, node);
+		Length++;
+		heapifyUp(node);
 	}
-	@Override
+
+	private void heapifyUp(INode<T> node) {
+		while (node != getRoot() && node.getParent() != null
+				&& node.getValue().compareTo(node.getParent().getValue()) > 0) {
+			swap(node, node.getParent());
+			node = node.getParent();
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void build(Collection unordered) {
-		
-				Comparable[] set=(Comparable[]) unordered.toArray(new Comparable[unordered.size()] );
-				for (int i=0;i<set.length;i++) {
-					elements[++lenght].setValue(set[i]);
-					heapifyUp(elements[lenght]);
-					
-					
-				}
-	
+		elements = (ArrayList<INode<T>>) unordered;
+		for (int i = elements.size() / 2; i > 0; i--) {
+			heapify(elements.get(i));
+		}
 
 	}
 
