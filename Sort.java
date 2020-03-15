@@ -1,26 +1,14 @@
 package eg.edu.alexu.csd.filestructure.sort;
 
 import eg.edu.alexu.csd.filestructure.sort.IHeap;
-import eg.edu.alexu.csd.filestructure.sort.INode;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Sort<T extends Comparable<T>> implements ISort<T> {
 
-    @SuppressWarnings("unchecked")
     @Override
     public IHeap<T> heapSort(ArrayList<T> unordered) {
-        /*
-        IHeap<T> heap = new Heap<T>();
-        IHeap<T> heap2 = new Heap<T>();
-        if (unordered != null) {
-            heap.build(unordered);
-        }
-        */
-
         Heap<T> heap = new Heap<T>();
         if (unordered==null) {
-            System.out.println("size==== "+heap.size());
             return heap;
         }
         return heap.sort(unordered);
@@ -48,7 +36,6 @@ public class Sort<T extends Comparable<T>> implements ISort<T> {
 
     private void merge(ArrayList<T> arr, int l, int m, int r)
     {
-        // Find sizes of two subarrays to be merged
         int n1 = m - l + 1;
         int n2 = r - m;
 

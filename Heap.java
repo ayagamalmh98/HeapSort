@@ -136,25 +136,11 @@ public class Heap<T extends Comparable<T>> implements IHeap<T> {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void build(Collection unordered) {
-		/*
-		 * if (unordered == null) { Length = 0; return; } ArrayList<T> set = new
-		 * ArrayList<>(unordered); Length = 0; for (int i = 0; i < set.size(); i++) {
-		 * if(i == 0) { elements.add(null); continue; } INode<T> k = new Node<T>(i);
-		 * k.setValue(set.get(i)); elements.add(k); } Length = elements.size(); for (int
-		 * i = elements.size() / 2; i > 0; i--) { heapify(elements.get(i)); }
-		 */
 		if (unordered == null) {
 			Length = 0;
 			return;
 		}
-
-		// elements = (List<INode<T>>) unordered;
-		/*
-		 * elements.add(0, null); ArrayList<T> set = new ArrayList<>(unordered); Length
-		 * = unordered.size(); for (int i = 1; i <= Length; i--) { INode<T> k = new
-		 * Node<T>(i); k.setValue(set.get(i)); elements.add(k); //
-		 * heapify(elements.get(i)); }
-		 */
+		
 		ArrayList<T> set = new ArrayList<>(unordered);
 		elements.add(0, null);
 
